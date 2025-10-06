@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-scheduler-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: job_scheduler
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  job-scheduler-app:
+    build: .
+    container_name: job-scheduler-app
+    depends_on:
+      - mysql-db
+    ports:
+      - "8080:8080"
+    # Pass configuration via environment variables to override the defaults
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/job_scheduler
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=rootpassword
+
+volumes:
+  mysql_data:
